@@ -22,16 +22,10 @@ Simply paste a URL, click **Generate**, preview the QR code instantly, and downl
 
 ## 🚀 Getting Started
 
-Clone the repository:
+open
 
 ```bash
-git clone https://github.com/yourusername/qr-code-generator.git
-```
-
-Open:
-
-```text
-index.html
+[git clone https://github.com/yourusername/qr-code-generator.git](https://daantech1.github.io/qr-code-generator-better/)
 ```
 
 That's it.
