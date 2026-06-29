@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Code Generator</title>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Segoe UI,Arial,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+    background:#050816;
+    color:white;
+}
+
+/* Animated RGB background */
+body::before{
+    content:"";
+    position:fixed;
+    width:250%;
+    height:250%;
+    background:conic-gradient(
+        #ff0055,
+        #ffcc00,
+        #00ff99,
+        #00aaff,
+        #7b2fff,
+        #ff0055
+    );
+    animation:rotateBg 20s linear infinite;
+    opacity:.12;
+}
+
+body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:
+        radial-gradient(circle at center, transparent 0%, #050816 70%);
+}
+
+@keyframes rotateBg{
+    from{transform:rotate(0deg);}
+    to{transform:rotate(360deg);}
+}
+
+.card{
+    position:relative;
+    width:430px;
+    padding:35px;
+    border-radius:22px;
+    z-index:1;
+    backdrop-filter:blur(18px);
+    background:rgba(15,23,42,.88);
+    overflow:hidden;
+}
+
+.card::before{
+    content:"";
+    position:absolute;
+    inset:-2px;
+    border-radius:22px;
+    background:linear-gradient(
+        90deg,
+        #ff0055,
+        #ffcc00,
+        #00ff99,
+        #00aaff,
+        #7b2fff,
+        #ff0055
+    );
+    background-size:400% 400%;
+    animation:borderMove 5s linear infinite;
+    z-index:-2;
+}
+
+.card::after{
+    content:"";
+    position:absolute;
+    inset:2px;
+    border-radius:20px;
+    background:#111827;
+    z-index:-1;
+}
+
+@keyframes borderMove{
+    0%{background-position:0%;}
+    100%{background-position:400%;}
+}
+
+h1{
+    text-align:center;
+    margin-bottom:25px;
+    color:#fff;
+    text-shadow:
+        0 0 8px #00aaff,
+        0 0 20px #7b2fff;
+}
+
+input{
+    width:100%;
+    padding:14px;
+    border-radius:12px;
+    border:1px solid #334155;
+    background:#0f172a;
+    color:white;
+    font-size:15px;
+    transition:.25s;
+}
+
+input:focus{
+    outline:none;
+    border-color:#00aaff;
+    box-shadow:0 0 15px rgba(0,170,255,.5);
+}
+
+button{
+    width:100%;
+    margin-top:16px;
+    padding:15px;
+    border:none;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    color:white;
+
+    background:linear-gradient(
+        90deg,
+        #2563eb,
+        #00aaff,
+        #7b2fff,
+        #2563eb
+    );
+
+    background-size:300% 300%;
+    animation:buttonAnim 4s linear infinite;
+    transition:.25s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 0 20px #00aaff;
+}
+
+@keyframes buttonAnim{
+    0%{background-position:0%;}
+    100%{background-position:300%;}
+}
+
+#preview{
+    margin-top:30px;
+    text-align:center;
+}
+
+canvas{
+    display:none;
+    background:white;
+    padding:14px;
+    border-radius:14px;
+    box-shadow:
+        0 0 20px rgba(255,255,255,.3),
+        0 0 35px rgba(0,170,255,.45);
+}
+
+#download{
+    display:none;
+    margin-top:20px;
+    padding:12px 22px;
+    text-decoration:none;
+    color:white;
+    font-weight:bold;
+    border-radius:12px;
+    background:linear-gradient(90deg,#10b981,#00ff99);
+    box-shadow:0 0 20px rgba(0,255,150,.45);
+}
+
+.footer{
+    margin-top:20px;
+    text-align:center;
+    color:#94a3b8;
+    font-size:13px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>⚡ QR Code Generator</h1>
+
+<input
+id="url"
+type="text"
+placeholder="https://voorbeeld.nl">
+
+<button id="generate">
+Generate QR Code
+</button>
+
+<div id="preview">
+<canvas id="canvas"></canvas>
+<br>
+<a id="download" download="qr-code.png">
+Download PNG
+</a>
+</div>
+
+<div class="footer">
+QR-code bevat alleen de ingevoerde URL en verloopt nooit.
+</div>
+
+</div>
+
+<script>
+
+document.getElementById("generate").addEventListener("click", generateQR);
+
+document.getElementById("url").addEventListener("keydown", function(e){
+    if(e.key==="Enter"){
+        generateQR();
+    }
+});
+
+function generateQR(){
+
+    const text=document.getElementById("url").value.trim();
+
+    if(text===""){
+        alert("Voer een URL in.");
+        return;
+    }
+
+    const canvas=document.getElementById("canvas");
+
+    QRCode.toCanvas(canvas,text,{
+        width:300,
+        margin:2,
+        errorCorrectionLevel:"H"
+    },function(error){
+
+        if(error){
+            console.error(error);
+            alert("Kon QR-code niet maken.");
+            return;
+        }
+
+        canvas.style.display="inline-block";
+
+        const download=document.getElementById("download");
+        download.href=canvas.toDataURL("image/png");
+        download.style.display="inline-block";
+
+    });
+
+}
+
+</script>
+
+</body>
+</html>
